@@ -101,18 +101,28 @@ $e+1\le\dim_K V_0$.
 \end{proof}
 
 \section{Formalization}\label{sec:formal}
-I formalized Theorem~\ref{thm:main} in Lean~4~\cite{Lean4} with Mathlib~\cite{Mathlib} as the
-theorem \texttt{card\_essential\_add\_one\_le\_finrank\_span}. The two steps reuse one move:
-solve a single vector out of a dependence and show it lands in the span of the family with that
-index removed. In Lean that is \texttt{Fintype.linearIndependent\_iff} for the first step and
-\texttt{mem\_span\_range\_iff\_exists\_fun} for the second, each followed by
-\texttt{Finset.sum\_erase\_add} to split off the chosen term. The conclusion uses
-\texttt{finrank\_span\_eq\_card}, \texttt{Submodule.finrank\_lt\_finrank\_of\_lt} and
-\texttt{FiniteDimensional.span\_of\_finite}.
-
+I formalized Theorem~\ref{thm:main} in Lean~4~\cite{Lean4} with Mathlib~\cite{Mathlib} as a
+single theorem:
+\begin{verbatim}
+  card_essential_add_one_le_finrank_span
+\end{verbatim}
+The two steps reuse one move: solve a single vector out of a dependence and show it lands in the
+span of the family with that index removed. The first step rests on the characterisation of
+linear independence over a finite index; the second writes a vector as an explicit combination
+over the range; each splits off the chosen term from a finite sum. The conclusion reads the rank
+of the independent essentials, applies strict monotonicity of the dimension under a proper
+inclusion, and uses that the span of a finite set is finite-dimensional. The Mathlib lemmas are:
+\begin{verbatim}
+  Fintype.linearIndependent_iff
+  mem_span_range_iff_exists_fun
+  Finset.sum_erase_add
+  finrank_span_eq_card
+  Submodule.finrank_lt_finrank_of_lt
+  FiniteDimensional.span_of_finite
+\end{verbatim}
 Mathlib also carries a matroid library, developed by Nelson and contributors~\cite{Nelson}, in
 which the statement could be phrased with coloops; I kept it in direct linear-algebra terms so
-that it imports into any development that already speaks of \texttt{finrank}.
+that it imports into any development that already speaks of ranks.
 
 \smallskip\noindent\textbf{Provenance.}
 This lemma began as an open gap in the public pequalnp.com collaboration~\cite{pequalnp}, an
