@@ -1,5 +1,14 @@
 # Essential vectors and rank
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24475596.svg)](https://doi.org/10.5281/zenodo.24475596)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Lean 4](https://img.shields.io/badge/Lean-v4.36.0-blue.svg)](https://lean-lang.org)
+[![Mathlib](https://img.shields.io/badge/Mathlib-fc4f59e-blue.svg)](https://github.com/leanprover-community/mathlib4)
+[![paper (PDF)](https://img.shields.io/badge/paper-PDF-B31B1B.svg)](NOTE.pdf)
+[![proof](https://img.shields.io/badge/proof-no%20sorry%2C%203%20axioms-brightgreen.svg)](NOTE.pdf)
+
+Code and data © 2026 Ella Agnes Puerto (MIT).
+
 A machine-checked Lean 4 proof of one small fact in linear algebra.
 
 Take a finite family of nonzero vectors in a vector space over a field, and suppose at least one of them is redundant: it lies in the span of the others. Call a vector **essential** when it is not in the span of the rest. Then the number of essential vectors, plus one, is at most the rank of the family.
