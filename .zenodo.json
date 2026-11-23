@@ -7,7 +7,7 @@
   ],
   "license": "MIT",
   "access_right": "open",
-  "keywords": ["Lean 4", "Mathlib", "formalized mathematics", "linear algebra", "matroid", "rank"],
+  "keywords": ["Lean 4", "Mathlib", "formalized mathematics", "interactive theorem proving", "linear algebra", "rank", "matroid", "coloop"],
   "related_identifiers": [
     {"identifier": "https://github.com/eagnespuerto/essential-vectors-rank", "relation": "isSupplementTo", "scheme": "url"}
   ]
