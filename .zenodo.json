@@ -1,0 +1,14 @@
+{
+  "title": "Essential vectors and rank: a machine-checked Lean 4 proof",
+  "upload_type": "software",
+  "description": "A machine-checked Lean 4 proof that in a finite family of nonzero vectors over a field with a redundancy, the number of essential vectors (those not in the span of the rest; the coloops of the represented matroid) plus one is at most the rank of the family. Checked against Lean v4.36.0 with Mathlib; axioms propext, Classical.choice, Quot.sound. Includes a typeset note (paper.tex, PDF).",
+  "creators": [
+    {"name": "Puerto, Ella Agnes", "affiliation": "Independent researcher"}
+  ],
+  "license": "MIT",
+  "access_right": "open",
+  "keywords": ["Lean 4", "Mathlib", "formalized mathematics", "linear algebra", "matroid", "rank"],
+  "related_identifiers": [
+    {"identifier": "https://github.com/eagnespuerto/essential-vectors-rank", "relation": "isSupplementTo", "scheme": "url"}
+  ]
+}

@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it."
+title: "Essential vectors and rank: a machine-checked Lean 4 proof"
+authors:
+  - family-names: Puerto
+    given-names: Ella Agnes
+    affiliation: "Independent researcher"
+version: "1.0"
+date-released: "2026-11-24"
+license: MIT
+doi: 10.5281/zenodo.24475596
+repository-code: "https://github.com/eagnespuerto/essential-vectors-rank"
+keywords:
+  - Lean 4
+  - Mathlib
+  - formalized mathematics
+  - linear algebra
+  - matroid
+  - rank

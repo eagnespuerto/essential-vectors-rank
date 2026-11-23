@@ -1,137 +1,157 @@
-\documentclass[11pt]{article}
-\usepackage[margin=1in]{geometry}
-\usepackage{amsmath,amssymb,amsthm}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\documentclass[11pt]{amsart}
+\usepackage[margin=1.1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
 
-\newtheorem{theorem}{Theorem}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
 \theoremstyle{definition}
-\newtheorem{definition}{Definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
 
-\title{Essential vectors and rank}
-\author{Ella Agnes Puerto\thanks{Independent researcher.}}
-\date{24 November 2026}
+\title[Essential vectors and rank]{Essential vectors and rank:\\ a machine-checked note}
+\author{Ella Agnes Puerto}
+\address{Independent researcher}
+\email{eagnespuerto@gmail.com}
+\date{November 2026. Source, data and this note: \href{https://doi.org/10.5281/zenodo.24475596}{doi:10.5281/zenodo.24475596}, released under the MIT license}
 
 \begin{document}
-\maketitle
 
 \begin{abstract}
-I prove a small fact in linear algebra and check it by machine. Take a finite
-list of nonzero vectors over a field, and suppose at least one is redundant,
-that is, it lies in the span of the others. Call a vector \emph{essential} when
-the others cannot reproduce it. Then the number of essential vectors, plus one,
-is at most the rank of the list. The proof is formalized in Lean~4 against
-Mathlib and uses only the axioms \texttt{propext}, \texttt{Classical.choice},
-and \texttt{Quot.sound}.
+Take a finite family of nonzero vectors over a field, and suppose at least one is redundant,
+that is, it lies in the span of the others. Call a vector \emph{essential} when the others
+cannot reproduce it. I show that the number of essential vectors, plus one, is at most the
+rank of the family. In matroid language the essential vectors are the coloops, and the
+statement is that a representable matroid with a circuit has strictly fewer coloops than its
+rank. The proof is formalized in Lean~4 against Mathlib and uses only the axioms
+\texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound}.
 \end{abstract}
 
-\section{Introduction}
+\maketitle
+
+\section{Introduction}\label{sec:intro}
 The fact is elementary, so I lead with the picture.
 
-Think of the vectors as people on a small crew, each able to pull in some
-direction of work. A person is \emph{redundant} when the rest of the crew
-together already covers everything they do. A person is \emph{essential} when no
-mix of the others can stand in for them. The essential people are the ones I
-cannot drop without losing reach.
+Think of the vectors as people on a small crew, each able to pull in some direction of work. A
+person is \emph{redundant} when the rest of the crew together already covers everything they
+do. A person is \emph{essential} when no mix of the others can stand in for them. The essential
+people are the ones I cannot drop without losing reach. Two things follow. No essential person
+wastes a slot, so each one adds a direction the rest did not have; that is why their count is
+at most the rank. And once some person is redundant, the crew has slack: the essential people
+alone do not use up all the room, so the reach beats their count by at least one.
 
-Two things follow. No essential person wastes a slot, so each one adds a
-direction the rest did not have; that is why their count is at most the rank.
-And once some person is redundant, the crew has slack: the essential people
-alone do not use up all the room, so the reach beats their count by at least
-one. That extra one is the whole point.
+The same idea works with roads. Each vector is a road out of town, and the rank is how many
+different places I can reach by combining roads. An essential road goes somewhere the others
+cannot. If one road is redundant, meaning I could already reach its end another way, then the
+roads together reach strictly more places than there are essential roads.
 
-Here is the same idea with roads. Each vector is a road out of town, and the
-rank is how many different places I can reach by combining roads. An essential
-road goes somewhere the others cannot. If one road is redundant, meaning I could
-already reach its end another way, then the roads together reach strictly more
-places than there are essential roads.
+\smallskip\noindent\textbf{Relation to matroid theory.}
+An essential vector is a \emph{coloop} of the matroid that the family represents: an element
+lying in every basis, equivalently a vector outside the closure (here, the span) of the
+remaining elements~\cite{Oxley}. The coloops of a matroid form an independent set, and a
+matroid is free exactly when every element is a coloop. Theorem~\ref{thm:main} is the
+quantitative form: once the family carries a circuit (a redundant vector), its coloops fall
+short of a basis, so their number drops below the rank. The argument is standard; the
+contribution is a short, fully checked proof in a shape that drops into a larger formal
+development.
 
-\section{Statement}
-Let $K$ be a field and $V$ a vector space over $K$. Let $r\colon \iota \to V$ be
-a family of vectors indexed by a finite type $\iota$. Assume $r_i \neq 0$ for
-every $i$, and assume one vector is redundant: some $r_j$ lies in
-$\operatorname{span}_K\{\, r_\ell : \ell \neq j \,\}$.
+\section{Statement}\label{sec:statement}
+Let $K$ be a field and $V$ a vector space over $K$. Let $r\colon\iota\to V$ be a family of
+vectors indexed by a finite type $\iota$. Assume $r_i\neq 0$ for every $i$, and assume one
+vector is redundant: some $r_j$ lies in $\operatorname{span}_K\{\,r_\ell:\ell\neq j\,\}$.
 
-\begin{definition}
-An index $i$ is \emph{essential} when
-$r_i \notin \operatorname{span}_K\{\, r_\ell : \ell \neq i \,\}$.
+\begin{definition}\label{def:essential}
+An index $i$ is \emph{essential} when $r_i\notin\operatorname{span}_K\{\,r_\ell:\ell\neq i\,\}$.
 \end{definition}
 
-Write $e$ for the number of essential indices and
-$V_0 = \operatorname{span}_K\{\, r_i : i \in \iota \,\}$ for the span of the whole
-list. A finite set spans $V_0$, so it is finite-dimensional; no assumption on the
-ambient space is needed.
+Write $e$ for the number of essential indices and $V_0=\operatorname{span}_K\{\,r_i:i\in\iota\,\}$
+for the span of the whole family. A finite set spans $V_0$, so it is finite-dimensional; no
+assumption on the ambient space $V$ is needed.
 
-\begin{theorem}
-$e + 1 \le \dim_K V_0$.
+\begin{theorem}\label{thm:main}
+$e+1\le\dim_K V_0$.
 \end{theorem}
 
-\section{Proof}
-\subsection{The essential vectors are independent}
-Suppose a combination of the essential vectors vanishes,
+\section{Proof}\label{sec:proof}
+\begin{proof}
+\textbf{The essential vectors are independent.} Suppose a combination of the essential vectors
+vanishes,
 \[ \sum_t c_t\, r_t = 0, \qquad t \text{ over the essential indices.} \]
 If some coefficient $c_{t_0}$ is nonzero, solve for $r_{t_0}$:
-\[ r_{t_0} = -\,c_{t_0}^{-1} \sum_{t \neq t_0} c_t\, r_t. \]
-Every term on the right is a scalar times $r_t$ with $t \neq t_0$, so
-$r_{t_0} \in \operatorname{span}_K\{\, r_\ell : \ell \neq t_0 \,\}$. That
-contradicts $t_0$ being essential. So all coefficients vanish, and the essential
-vectors are linearly independent. Independence gives
-$\dim_K(\text{span of the essentials}) = e$, and that span lies in $V_0$, so
-$e \le \dim_K V_0$.
+\[ r_{t_0} = -\,c_{t_0}^{-1} \sum_{t\neq t_0} c_t\, r_t. \]
+Every term on the right is a scalar times $r_t$ with $t\neq t_0$, so
+$r_{t_0}\in\operatorname{span}_K\{\,r_\ell:\ell\neq t_0\,\}$, contradicting that $t_0$ is
+essential. So all coefficients vanish, the essential vectors are linearly independent,
+$\dim_K(\text{span of the essentials})=e$, and that span lies in $V_0$, giving $e\le\dim_K V_0$.
 
-\subsection{The essentials do not span}
-Let $r_j$ be the redundant vector from the hypothesis; it is nonzero. Suppose
-$r_j$ were in the span of the essentials,
+\smallskip
+\textbf{The essentials do not span.} Let $r_j$ be the redundant vector from the hypothesis; it
+is nonzero. Suppose $r_j$ were in the span of the essentials,
 \[ r_j = \sum_t c_t\, r_t, \qquad t \text{ over the essential indices.} \]
-Not every $c_t$ is zero, since $r_j \neq 0$. Pick $t_0$ with $c_{t_0} \neq 0$ and
-solve:
-\[ r_{t_0} = c_{t_0}^{-1}\Bigl( r_j - \sum_{t \neq t_0} c_t\, r_t \Bigr). \]
-The index $j$ is not essential, so $j \neq t_0$, and every index on the right
-differs from $t_0$. Hence
-$r_{t_0} \in \operatorname{span}_K\{\, r_\ell : \ell \neq t_0 \,\}$, contradicting
-that $t_0$ is essential.
+Not every $c_t$ is zero, since $r_j\neq 0$. Pick $t_0$ with $c_{t_0}\neq 0$ and solve:
+\[ r_{t_0} = c_{t_0}^{-1}\Bigl( r_j - \sum_{t\neq t_0} c_t\, r_t \Bigr). \]
+The index $j$ is not essential, so $j\neq t_0$, and every index on the right differs from
+$t_0$; hence $r_{t_0}\in\operatorname{span}_K\{\,r_\ell:\ell\neq t_0\,\}$, again contradicting
+that $t_0$ is essential. So $r_j$ lies in $V_0$ but outside the span of the essentials, making
+that span a proper subspace of $V_0$. A strict inclusion of finite-dimensional subspaces loses
+at least one dimension, so $e=\dim_K(\text{span of the essentials})<\dim_K V_0$, that is,
+$e+1\le\dim_K V_0$.
+\end{proof}
 
-So $r_j$ lies in $V_0$ but outside the span of the essentials, making that span a
-proper subspace of $V_0$. A strict inclusion of finite-dimensional subspaces
-loses at least one dimension, so
-\[ e = \dim_K(\text{span of the essentials}) < \dim_K V_0, \]
-which is $e + 1 \le \dim_K V_0$. \hfill$\square$
+\section{Formalization}\label{sec:formal}
+I formalized Theorem~\ref{thm:main} in Lean~4~\cite{Lean4} with Mathlib~\cite{Mathlib} as the
+theorem \texttt{card\_essential\_add\_one\_le\_finrank\_span}. The two steps reuse one move:
+solve a single vector out of a dependence and show it lands in the span of the family with that
+index removed. In Lean that is \texttt{Fintype.linearIndependent\_iff} for the first step and
+\texttt{mem\_span\_range\_iff\_exists\_fun} for the second, each followed by
+\texttt{Finset.sum\_erase\_add} to split off the chosen term. The conclusion uses
+\texttt{finrank\_span\_eq\_card}, \texttt{Submodule.finrank\_lt\_finrank\_of\_lt} and
+\texttt{FiniteDimensional.span\_of\_finite}.
 
-\section{Formalization}
-I formalized the theorem in Lean~4~\cite{lean} with Mathlib~\cite{mathlib} as
-\texttt{card\_essential\_add\_one\_le\_finrank\_span}. The two steps reuse one
-move: solve a single vector out of a dependence and show it lands in the span of
-the list with that index removed. In Lean that is
-\texttt{Fintype.linearIndependent\_iff} for Section~3.1 and
-\texttt{mem\_span\_range\_iff\_exists\_fun} for Section~3.2, each followed by
-\texttt{Finset.sum\_erase\_add} to split off the chosen term. The finish uses
-\texttt{finrank\_span\_eq\_card}, \texttt{Submodule.finrank\_lt\_finrank\_of\_lt},
-and \texttt{FiniteDimensional.span\_of\_finite}.
+Mathlib also carries a matroid library, developed by Nelson and contributors~\cite{Nelson}, in
+which the statement could be phrased with coloops; I kept it in direct linear-algebra terms so
+that it imports into any development that already speaks of \texttt{finrank}.
 
-I checked the file against Lean \texttt{v4.36.0} with Mathlib pinned to commit
-\texttt{fc4f59e} (the v4.36.0 release). It has no \texttt{sorry} and no
-\texttt{native\_decide}, and \texttt{\#print axioms} reports only
-\texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}.
+\smallskip\noindent\textbf{Provenance.}
+This lemma began as an open gap in the public pequalnp.com collaboration~\cite{pequalnp}, an
+attempt at P versus NP, where it was stated over the rationals. The thread for that gap was
+closed before the proof could be merged, so I generalized it to an arbitrary field and record
+it here on its own.
 
-This lemma began as an open gap in the public pequalnp.com collaboration~\cite{pequalnp},
-an attempt at P versus NP, where it was stated over the rationals. The thread for
-that gap was closed before the proof could be merged, so I generalized it to an
-arbitrary field and record it here on its own.
+\section*{Acknowledgements and use of AI}
+This note and its Lean proof were prepared by the author with extensive use of the AI assistant
+Claude (Anthropic; model Claude Opus~4.8), through Claude Code: the formalization, the
+write-up, and the checking of references against primary sources.
 
-\section*{Availability}
-The Lean source, this paper, and a build configuration are in the repository~\cite{repo},
-archived on Zenodo~\cite{zenodo}.
+\appendix
+\section{Reproducibility}\label{app:repro}
+The Lean source, this note and a build configuration are in the repository~\cite{Repo} and
+archived on Zenodo~\cite{Zenodo}. The proof was checked with Lean~\texttt{v4.36.0} and Mathlib
+pinned to commit \texttt{fc4f59e} (the v4.36.0 release). It has no \texttt{sorry} and no
+\texttt{native\_decide}; \texttt{\#print axioms} reports only \texttt{propext},
+\texttt{Classical.choice} and \texttt{Quot.sound}. To rebuild, run \texttt{lake exe cache get}
+and then \texttt{lake build}.
 
 \begin{thebibliography}{9}
-\bibitem{lean} L.~de Moura and S.~Ullrich. \emph{The Lean~4 Theorem Prover and Programming
-  Language}. In \emph{Automated Deduction -- CADE~28}, 2021. \url{https://lean-lang.org}.
-\bibitem{mathlib} The mathlib Community. \emph{The Lean Mathematical Library}. In
-  \emph{Proc.\ CPP~2020}. \url{https://github.com/leanprover-community/mathlib4}.
-\bibitem{pequalnp} The pequalnp collaboration. \emph{A public attempt at P versus NP}.
-  \url{https://pequalnp.com}.
-\bibitem{repo} E.~A.~Puerto. \emph{Essential vectors and rank} (source repository).
+\bibitem{Lean4} L.~de~Moura and S.~Ullrich, \emph{The Lean~4 theorem prover and programming
+  language}, in Automated Deduction---CADE~28 (A.~Platzer and G.~Sutcliffe, eds.), Lecture
+  Notes in Comput.\ Sci., Springer, 2021, pp.~625--635;
+  \href{https://doi.org/10.1007/978-3-030-79876-5_37}{doi:10.1007/978-3-030-79876-5\_37}.
+\bibitem{Mathlib} The mathlib Community, \emph{The Lean mathematical library}, in Proc.\ 9th
+  ACM SIGPLAN Int.\ Conf.\ on Certified Programs and Proofs (CPP~2020), 2020, pp.~367--381;
+  \href{https://doi.org/10.1145/3372885.3373824}{doi:10.1145/3372885.3373824}; arXiv:1910.09336.
+\bibitem{Oxley} J.~G.~Oxley, \emph{Matroid Theory}, 2nd ed., Oxford Graduate Texts in Math.\
+  \textbf{21}, Oxford Univ.\ Press, 2011.
+\bibitem{Nelson} P.~Nelson and contributors, \emph{A formalization of matroids in Lean},
+  development repository, \url{https://github.com/apnelson1/Matroid}; much of it integrated
+  into Mathlib~\cite{Mathlib}.
+\bibitem{pequalnp} The pequalnp collaboration, \emph{A public attempt at P versus NP},
+  \url{https://pequalnp.com}; proofs repository \url{https://github.com/brilliant-hq/pequalnp-proofs}.
+\bibitem{Repo} E.~A.~Puerto, \emph{Essential vectors and rank} (source repository),
   \url{https://github.com/eagnespuerto/essential-vectors-rank}.
-\bibitem{zenodo} E.~A.~Puerto. \emph{Essential vectors and rank: a machine-checked Lean~4
-  proof}. Zenodo, 2026. DOI:~\href{https://doi.org/10.5281/zenodo.24475596}{10.5281/zenodo.24475596}.
+\bibitem{Zenodo} E.~A.~Puerto, \emph{Essential vectors and rank: a machine-checked Lean~4
+  proof}, Zenodo, 2026; \href{https://doi.org/10.5281/zenodo.24475596}{doi:10.5281/zenodo.24475596}.
 \end{thebibliography}
 
 \end{document}
