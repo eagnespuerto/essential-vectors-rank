@@ -97,7 +97,7 @@ loses at least one dimension, so
 which is $e + 1 \le \dim_K V_0$. \hfill$\square$
 
 \section{Formalization}
-I formalized the theorem in Lean~4 with Mathlib as
+I formalized the theorem in Lean~4~\cite{lean} with Mathlib~\cite{mathlib} as
 \texttt{card\_essential\_add\_one\_le\_finrank\_span}. The two steps reuse one
 move: solve a single vector out of a dependence and show it lands in the span of
 the list with that index removed. In Lean that is
@@ -112,15 +112,26 @@ I checked the file against Lean \texttt{v4.36.0} with Mathlib pinned to commit
 \texttt{native\_decide}, and \texttt{\#print axioms} reports only
 \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}.
 
-This lemma began as an open gap in the public pequalnp.com collaboration, an
-attempt at P versus NP, where it was stated over the rationals. The thread for
+This lemma began as an open gap in the public pequalnp.com collaboration~\cite{pequalnp},
+an attempt at P versus NP, where it was stated over the rationals. The thread for
 that gap was closed before the proof could be merged, so I generalized it to an
 arbitrary field and record it here on its own.
 
 \section*{Availability}
-Source code: \url{https://github.com/eagnespuerto/essential-vectors-rank}.
-Archived on Zenodo:
-\href{https://doi.org/10.5281/zenodo.24475597}{10.5281/zenodo.24475597}. Built on
-the Lean~4 theorem prover and the Mathlib library.
+The Lean source, this paper, and a build configuration are in the repository~\cite{repo},
+archived on Zenodo~\cite{zenodo}.
+
+\begin{thebibliography}{9}
+\bibitem{lean} L.~de Moura and S.~Ullrich. \emph{The Lean~4 Theorem Prover and Programming
+  Language}. In \emph{Automated Deduction -- CADE~28}, 2021. \url{https://lean-lang.org}.
+\bibitem{mathlib} The mathlib Community. \emph{The Lean Mathematical Library}. In
+  \emph{Proc.\ CPP~2020}. \url{https://github.com/leanprover-community/mathlib4}.
+\bibitem{pequalnp} The pequalnp collaboration. \emph{A public attempt at P versus NP}.
+  \url{https://pequalnp.com}.
+\bibitem{repo} E.~A.~Puerto. \emph{Essential vectors and rank} (source repository).
+  \url{https://github.com/eagnespuerto/essential-vectors-rank}.
+\bibitem{zenodo} E.~A.~Puerto. \emph{Essential vectors and rank: a machine-checked Lean~4
+  proof}. Zenodo, 2026. DOI:~\href{https://doi.org/10.5281/zenodo.24475596}{10.5281/zenodo.24475596}.
+\end{thebibliography}
 
 \end{document}
