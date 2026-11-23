@@ -1,0 +1,12 @@
+name = "EssentialVectorsRank"
+defaultTargets = ["EssentialVectorsRank"]
+
+# Mathlib pinned to the v4.36.0 release commit. The Lean version in
+# lean-toolchain is the one that commit names. Change both together or neither.
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4"
+rev = "fc4f59e577feb1a4956671bc04ac18aaaf8cd842"
+
+[[lean_lib]]
+name = "EssentialVectorsRank"
