@@ -20,7 +20,7 @@ It holds over any field, for any vector space, with the family indexed by any fi
 
 ## The proof
 
-Two steps. The full argument is in [NOTE.md](NOTE.md).
+Two steps. The full write-up is in [NOTE.md](NOTE.md), typeset as a short paper in [paper.tex](paper.tex) (compiled to [NOTE.pdf](NOTE.pdf)).
 
 1. The essential vectors are linearly independent, so the rank of their span is their count `e`, and `e ≤ finrank`.
 2. A nonzero redundant vector cannot be in the span of the essentials, so the essentials do not span the whole family. The inclusion is strict, which raises the rank by at least one.

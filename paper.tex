@@ -1,0 +1,126 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+\newtheorem{theorem}{Theorem}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+
+\title{Essential vectors and rank}
+\author{Ella Agnes Puerto\thanks{Independent researcher.}}
+\date{24 November 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+I prove a small fact in linear algebra and check it by machine. Take a finite
+list of nonzero vectors over a field, and suppose at least one is redundant,
+that is, it lies in the span of the others. Call a vector \emph{essential} when
+the others cannot reproduce it. Then the number of essential vectors, plus one,
+is at most the rank of the list. The proof is formalized in Lean~4 against
+Mathlib and uses only the axioms \texttt{propext}, \texttt{Classical.choice},
+and \texttt{Quot.sound}.
+\end{abstract}
+
+\section{Introduction}
+The fact is elementary, so I lead with the picture.
+
+Think of the vectors as people on a small crew, each able to pull in some
+direction of work. A person is \emph{redundant} when the rest of the crew
+together already covers everything they do. A person is \emph{essential} when no
+mix of the others can stand in for them. The essential people are the ones I
+cannot drop without losing reach.
+
+Two things follow. No essential person wastes a slot, so each one adds a
+direction the rest did not have; that is why their count is at most the rank.
+And once some person is redundant, the crew has slack: the essential people
+alone do not use up all the room, so the reach beats their count by at least
+one. That extra one is the whole point.
+
+Here is the same idea with roads. Each vector is a road out of town, and the
+rank is how many different places I can reach by combining roads. An essential
+road goes somewhere the others cannot. If one road is redundant, meaning I could
+already reach its end another way, then the roads together reach strictly more
+places than there are essential roads.
+
+\section{Statement}
+Let $K$ be a field and $V$ a vector space over $K$. Let $r\colon \iota \to V$ be
+a family of vectors indexed by a finite type $\iota$. Assume $r_i \neq 0$ for
+every $i$, and assume one vector is redundant: some $r_j$ lies in
+$\operatorname{span}_K\{\, r_\ell : \ell \neq j \,\}$.
+
+\begin{definition}
+An index $i$ is \emph{essential} when
+$r_i \notin \operatorname{span}_K\{\, r_\ell : \ell \neq i \,\}$.
+\end{definition}
+
+Write $e$ for the number of essential indices and
+$V_0 = \operatorname{span}_K\{\, r_i : i \in \iota \,\}$ for the span of the whole
+list. A finite set spans $V_0$, so it is finite-dimensional; no assumption on the
+ambient space is needed.
+
+\begin{theorem}
+$e + 1 \le \dim_K V_0$.
+\end{theorem}
+
+\section{Proof}
+\subsection{The essential vectors are independent}
+Suppose a combination of the essential vectors vanishes,
+\[ \sum_t c_t\, r_t = 0, \qquad t \text{ over the essential indices.} \]
+If some coefficient $c_{t_0}$ is nonzero, solve for $r_{t_0}$:
+\[ r_{t_0} = -\,c_{t_0}^{-1} \sum_{t \neq t_0} c_t\, r_t. \]
+Every term on the right is a scalar times $r_t$ with $t \neq t_0$, so
+$r_{t_0} \in \operatorname{span}_K\{\, r_\ell : \ell \neq t_0 \,\}$. That
+contradicts $t_0$ being essential. So all coefficients vanish, and the essential
+vectors are linearly independent. Independence gives
+$\dim_K(\text{span of the essentials}) = e$, and that span lies in $V_0$, so
+$e \le \dim_K V_0$.
+
+\subsection{The essentials do not span}
+Let $r_j$ be the redundant vector from the hypothesis; it is nonzero. Suppose
+$r_j$ were in the span of the essentials,
+\[ r_j = \sum_t c_t\, r_t, \qquad t \text{ over the essential indices.} \]
+Not every $c_t$ is zero, since $r_j \neq 0$. Pick $t_0$ with $c_{t_0} \neq 0$ and
+solve:
+\[ r_{t_0} = c_{t_0}^{-1}\Bigl( r_j - \sum_{t \neq t_0} c_t\, r_t \Bigr). \]
+The index $j$ is not essential, so $j \neq t_0$, and every index on the right
+differs from $t_0$. Hence
+$r_{t_0} \in \operatorname{span}_K\{\, r_\ell : \ell \neq t_0 \,\}$, contradicting
+that $t_0$ is essential.
+
+So $r_j$ lies in $V_0$ but outside the span of the essentials, making that span a
+proper subspace of $V_0$. A strict inclusion of finite-dimensional subspaces
+loses at least one dimension, so
+\[ e = \dim_K(\text{span of the essentials}) < \dim_K V_0, \]
+which is $e + 1 \le \dim_K V_0$. \hfill$\square$
+
+\section{Formalization}
+I formalized the theorem in Lean~4 with Mathlib as
+\texttt{card\_essential\_add\_one\_le\_finrank\_span}. The two steps reuse one
+move: solve a single vector out of a dependence and show it lands in the span of
+the list with that index removed. In Lean that is
+\texttt{Fintype.linearIndependent\_iff} for Section~3.1 and
+\texttt{mem\_span\_range\_iff\_exists\_fun} for Section~3.2, each followed by
+\texttt{Finset.sum\_erase\_add} to split off the chosen term. The finish uses
+\texttt{finrank\_span\_eq\_card}, \texttt{Submodule.finrank\_lt\_finrank\_of\_lt},
+and \texttt{FiniteDimensional.span\_of\_finite}.
+
+I checked the file against Lean \texttt{v4.36.0} with Mathlib pinned to commit
+\texttt{fc4f59e} (the v4.36.0 release). It has no \texttt{sorry} and no
+\texttt{native\_decide}, and \texttt{\#print axioms} reports only
+\texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}.
+
+This lemma began as an open gap in the public pequalnp.com collaboration, an
+attempt at P versus NP, where it was stated over the rationals. The thread for
+that gap was closed before the proof could be merged, so I generalized it to an
+arbitrary field and record it here on its own.
+
+\section*{Availability}
+Source code: \url{https://github.com/eagnespuerto/essential-vectors-rank}.
+Archived on Zenodo:
+\href{https://doi.org/10.5281/zenodo.24475597}{10.5281/zenodo.24475597}. Built on
+the Lean~4 theorem prover and the Mathlib library.
+
+\end{document}
